@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "1e9756cc-dc2c-44f9-b856-a7c59bbe7c2f",
+		"name": "authAsyncCalculator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27002830"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"login\": \"user01\",\r\n  \"password\": \"psw_user_01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"login\": \"user01\",\r\n  \"password\": \"psw_user_01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY5ODk5NDAsImlhdCI6MTc0Njk4NjM0MCwibG9naW4iOiJ1c2VyMDMiLCJuYmYiOjE3NDY5ODYzNDAsInVzZXJfaWQiOjN9.JsPrpmW98PTDenrv9TZqs3yLcd1KBv-CL3QDtkkuVMw\",\r\n  \"expression\": \"2+2*2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/calculate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "expressions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY5NzM3NzMsImlhdCI6MTc0Njk3MDE3MywibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5NzAxNzMsInVzZXJfaWQiOjF9.ivwu4K-W24lrK8p_EeMLFgXWJyrk6pNL7qJ-Duv1LF8\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/expressions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"expressions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "expressionById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY5ODk5NDAsImlhdCI6MTc0Njk4NjM0MCwibG9naW4iOiJ1c2VyMDMiLCJuYmYiOjE3NDY5ODYzNDAsInVzZXJfaWQiOjN9.JsPrpmW98PTDenrv9TZqs3yLcd1KBv-CL3QDtkkuVMw\"\r\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/expressions/12",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"expressions",
+						"12"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
