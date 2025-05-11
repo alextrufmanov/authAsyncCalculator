@@ -10,7 +10,7 @@
   "password": "пароль"
 }
 ```
-Данные регистрируемого пользователя записываются в базу данных (SQLite) и сохраняются при перезагрузке ПО. Так же в БД сохраняются данные вычисленных выражений в контексте того конкретного пользователя, который отправил запрос на вычисление этого вырадения. 
+Данные регистрируемого пользователя записываются в базу данных (SQLite) и сохраняются при перезагрузке ПО. Пароль хранится в хэшированном виде (не может быть получен в явном виде из БД). Так же в БД сохраняются данные вычисленных выражений в контексте того конкретного пользователя, который отправил запрос на вычисление этого вырадения. 
 Если при запуске сервиса БД обнаружить не удалось, то она создается автоматически. Исходно в репозитарии присутствует БД с одним пользователем user01/psw_user_01 и зарегистрированным от его имени выражением.
 Перед отправкой сервису запросов на вычисление выражений и получения результатов их вычисления пользователь должен авторизоваться с помощью POST запроса на эндпоинт ```/api/v1/login  ```, Body запроса должно содержать JSON следующего вида:
 ```
@@ -142,6 +142,8 @@ go test .\pkg\agent\
 
 ---
 ### ПРОВЕРКА РАБОТЫ СЕРВИСА С ПОМОЩЬЮ CURL 
+Обратите внимание, что хотя в запросах использован JWT токен пользователя user01/psw_user_01 (уже зарегистрированного в БД, поставлямой в репозитории по умолчанию, повторная регистрация будет отклонена) с довольно большим сроком жизни, может понадобиться его обновить. В этом случае не забудте копировать в Body запросов новый токен, получаемый при логине. 
+
 1. Регистрация пользователя user01 с паролем psw_user_01
 ```sh
 curl -X POST -H "Content-Type: application/json" -d "{\"login\": \"user01\",\"password\": \"psw_user_01\"}" localhost:8080/api/v1/register
@@ -155,97 +157,97 @@ curl -X POST -H "Content-Type: application/json" -d "{\"login\": \"user01\",\"pa
 ##
 3. Простое выражение ```2+2*2```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*2\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"2+2*2\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 4. Простое выражение ```-2+2*2``` (первый унарный минус). Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-2+2*2\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-2+2*2\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 5. Простое выражение ```2+2*(-2)``` (унарный минус в скобках). Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*(-2)\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"2+2*(-2)\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 6. Простое выражение со скобками ```-(2+2)*2``` (унарный минус перед скобками). Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"(2+2)*2\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"(2+2)*2\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 7. Сложное выражение ```-3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 8. Сложное выражение ```-(3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-(3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-(3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 9. Сложное выражение с пробелами ```-(3*( 12/ 4+(-2 + 8/2 ) ) +(7-20/5*(9-2* 2*2+1))*(  -10))```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-(3*( 12/ 4+(-2 + 8/2 ) ) +(7-20/5*(9-2* 2*2+1))*(  -10))\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-(3*( 12/ 4+(-2 + 8/2 ) ) +(7-20/5*(9-2* 2*2+1))*(  -10))\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"id":<число>}```
 ##
 10. Получение полного списка состояний всех выражений. Наберите в командной строке
 ```sh
-curl -X GET localhost:8080/api/v1/expressions
+curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\"}" localhost:8080/api/v1/expressions
 ```
 Ответ: ```{"expressions":[{"Expression":"1+2*3","id":1,"status":"success","result":7},{"Expression":"(1+2)*(3+4)","id":4,"status":"calculate","result":0}]}```
 ##
 11. Получение состояния выражения с "id": 1. Наберите в командной строке
 ```sh
-curl -X GET localhost:8080/api/v1/expressions/1
+curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\"}" localhost:8080/api/v1/expressions/1
 ```
 Ответ: ```{"expression":{"Expression":"1+2*3","id":1,"status":"success","result":7}}```
 ##
 12. Получение состояния несуществующего выражения с "id": 2. Наберите в командной строке
 ```sh
-curl -X GET localhost:8080/api/v1/expressions/2
+curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\"}" localhost:8080/api/v1/expressions/2
 ```
 Ответ: ```404 not found.```
 ##
 13. Ошибка в выражении (непарная скобка) ```-3*12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-3*12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-3*12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10)\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"error": "Expression is not valid"}```
 ##
 14. Ошибка в выражении (недопустимый символ ```=```) ```-(3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))=```. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))=\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-3*(12/4+(-2+8/2))+(7-20/5*(9-2*2*2+1))*(-10))=\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"error": "Expression is not valid"}```
 ##
 15. Ошибка в выражении (недопустимый символы) -(3*(12/4+(-A+8/2))+(7-20/5*(9-2*2*2+b))*(-10))=. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"-3*(12/4+(-A+8/2))+(7-20/5*(9-2*2*2+b))*(-10))\"}" localhost:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"-3*(12/4+(-A+8/2))+(7-20/5*(9-2*2*2+b))*(-10))\"}" localhost:8080/api/v1/calculate
 ```
 Ответ: ```{"error": "Expression is not valid"}```
 ##
 16. Ошибка в хосте. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*2\"}" localhostttt:8080/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"2+2*2\"}" localhostttt:8080/api/v1/calculate
 ```
 Ответ: ```curl: (6) Could not resolve host: localhostttt```
 ##
 17. Ошибка в номере порта. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*2\"}" localhost:8081/api/v1/calculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"2+2*2\"}" localhost:8081/api/v1/calculate
 ```
 Ответ: ```curl: (7) Failed to connect to localhost port 8081 after 2255 ms: Could not connect to server```
 ##
 18. Ошибка в пути. Наберите в командной строке
 ```sh
-curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*2\"}" localhost:8080/api/v2/recalculate
+curl -X POST -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\", \"expression\": \"2+2*2\"}" localhost:8080/api/v2/recalculate
 ```
 Ответ: ```404 page not found```
 
@@ -253,7 +255,7 @@ curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"2+2*2\"}
 ### ПРОВЕРКА РАБОТЫ СЕРВИСА С ПОМОЩЬЮ POSTMAN 
 
 1. Установите Postman (https://www.postman.com/).
-2. Импортируйте в Postman коллекцию запросов для asyncCalculator. Файл коллекции ```authAsyncCalculator.postman_collection.json``` расположен в корне репозитория. Обратите внимание, что хотя в запросах использован JWT токен пользователя user01/psw_user_01 (уже зарегистрированного в БД, поставлямой в репозитории по умолчанию) с довольно большим сроком жизни, может понадобиться его обновить. В этом случае не забудте копировать в Bodt запросов токен, получаемый при логине.
+2. Импортируйте в Postman коллекцию запросов для asyncCalculator. Файл коллекции ```authAsyncCalculator.postman_collection.json``` расположен в корне репозитория. Обратите внимание, что хотя в запросах использован JWT токен пользователя user01/psw_user_01 (уже зарегистрированного в БД, поставлямой в репозитории по умолчанию, повторная регистрация будет отклонена) с довольно большим сроком жизни, может понадобиться его обновить. В этом случае не забудте копировать в Body запросов новый токен, получаемый при логине.
 3. Выберете необходимый вам запрос, при необходимости измените параметры, нажмите «Send».
 
 ---
