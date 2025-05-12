@@ -211,7 +211,7 @@ curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI
 ##
 12. Получение состояния несуществующего выражения с "id": 2. Наберите в командной строке
 ```sh
-curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\"}" localhost:8080/api/v1/expressions/2
+curl -X GET -H "Content-Type: application/json" -d "{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODI5OTI4MjAsImlhdCI6MTc0Njk5MjgyMCwibG9naW4iOiJ1c2VyMDEiLCJuYmYiOjE3NDY5OTI4MjAsInVzZXJfaWQiOjF9.1gm_1vDApQpgv7uvTGPtqXxHzfJ1XV9lgydYZnRU3Lc\"}" localhost:8080/api/v1/expressions/2000
 ```
 Ответ: ```404 not found.```
 ##
